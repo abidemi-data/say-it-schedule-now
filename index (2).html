@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Say It, Schedule It</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;800&family=Unbounded:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#eef0f6;--ink:#1b1d2e;--mute:#666b84;--card:#fff;--line:#dcdff0;--ac:#3b36d6;--acink:#fff;--rec:#e0334c;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12131c;--ink:#eceefb;--mute:#9a9fb8;--card:#1b1d2b;--line:#2b2e44;--ac:#8a86ff;--acink:#0f0f24;--rec:#ff6178}}
+:root[data-theme="dark"]{--bg:#12131c;--ink:#eceefb;--mute:#9a9fb8;--card:#1b1d2b;--line:#2b2e44;--ac:#8a86ff;--acink:#0f0f24;--rec:#ff6178}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 17px/1.5 Manrope,"Helvetica Neue",Arial,sans-serif}
+main{max-width:480px;margin:0 auto;padding:36px 22px 48px;text-align:center}
+h1{font-family:Unbounded,"Arial Black",Impact,sans-serif;font-weight:700;font-size:clamp(2.3rem,10.5vw,3.3rem);line-height:1.05;letter-spacing:-.04em;margin:0 0 6px}
+.sub{color:var(--mute);margin:0 0 34px}
+.mic{width:152px;height:152px;border-radius:50%;border:0;background:var(--ac);color:var(--acink);display:inline-grid;place-items:center;cursor:pointer;box-shadow:0 0 0 12px color-mix(in srgb,var(--ac) 14%,transparent)}
+.mic.on{background:var(--rec);color:#fff;animation:ring 1.4s infinite}
+@keyframes ring{0%{box-shadow:0 0 0 10px color-mix(in srgb,var(--rec) 30%,transparent)}100%{box-shadow:0 0 0 34px color-mix(in srgb,var(--rec) 0%,transparent)}}
+@media (prefers-reduced-motion:reduce){.mic.on{animation:none}}
+.mic:disabled{opacity:.4;cursor:default}
+:focus-visible{outline:3px solid var(--ac);outline-offset:3px}
+#status{min-height:1.5em;margin:22px 0 0;color:var(--mute)}
+#heard{margin:8px 0 0;font-style:italic;color:var(--mute);min-height:1.5em}
+.lnk{background:none;border:0;color:var(--ac);font:500 1rem Unbounded,Arial,sans-serif;cursor:pointer;margin-top:22px;padding:12px 16px;text-decoration:underline;text-underline-offset:5px}
+#typebox{display:none;margin-top:12px}#typebox.open{display:block}
+input{width:100%;font:500 1rem Manrope,"Helvetica Neue",Arial,sans-serif;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.card{margin-top:26px;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:20px;padding:22px}
+.card h2{font-family:Unbounded,Arial,sans-serif;font-weight:700;font-size:1.2rem;line-height:1.25;letter-spacing:-.02em;margin:0 0 8px}
+.when{margin:0;font-weight:600}.where{margin:2px 0 0;color:var(--mute)}.note{margin:10px 0 0;font-size:.9rem;color:var(--mute)}
+details{margin-top:14px}summary{cursor:pointer;color:var(--mute);font-size:.95rem}
+label{display:block;font-size:.85rem;color:var(--mute);margin-top:12px}label input{margin-top:4px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.go{display:block;margin-top:20px;text-align:center;padding:15px;border-radius:14px;background:var(--ac);color:var(--acink);font-weight:800;text-decoration:none}
+.quiet{display:block;margin:10px auto 0;background:none;border:0;color:var(--mute);font:600 .9rem Manrope,Arial,sans-serif;cursor:pointer;padding:6px}
+.mic{transition:transform .2s,background .25s}
+.mic:not(.on):not(:disabled){animation:breathe 3.6s ease-in-out infinite}
+@keyframes breathe{50%{transform:scale(1.05);box-shadow:0 0 0 22px color-mix(in srgb,var(--ac) 8%,transparent)}}
+.mic:active{transform:scale(.94)}
+.bars{display:none;gap:7px;align-items:center;height:64px}
+.mic.on .bars{display:flex}.mic.on svg{display:none}
+.bars i{width:8px;height:14px;border-radius:5px;background:currentColor;animation:eq .9s ease-in-out infinite}
+.bars i:nth-child(2){animation-delay:.12s}.bars i:nth-child(3){animation-delay:.24s}.bars i:nth-child(4){animation-delay:.36s}.bars i:nth-child(5){animation-delay:.48s}
+@keyframes eq{0%,100%{height:12px}50%{height:58px}}
+.think{display:inline-flex;gap:4px;vertical-align:middle;margin-right:9px}
+.think i{width:7px;height:7px;border-radius:50%;background:var(--ac);animation:bob 1s ease-in-out infinite}
+.think i:nth-child(2){animation-delay:.15s}.think i:nth-child(3){animation-delay:.3s}
+@keyframes bob{40%{transform:translateY(-6px)}}
+.card{animation:rise .5s cubic-bezier(.2,.8,.2,1)}
+@keyframes rise{from{opacity:0;transform:translateY(18px) scale(.98)}}
+.go{transition:background .3s;font-family:Unbounded,Manrope,Arial,sans-serif;font-weight:700;font-size:.9rem}.go.done{background:#1f9d6b;color:#fff}
+.hi{margin:0 0 8px;color:var(--ac);font-weight:600}.hi:empty{display:none}.brand{display:inline-flex;align-items:center;gap:10px;margin:0 0 26px;font-family:Unbounded,Arial,sans-serif;font-weight:700;font-size:1.05rem;letter-spacing:-.02em;color:var(--ink)}.brand b{color:var(--ac);font-weight:700}.mark{display:grid;place-items:center;width:34px;height:34px;border-radius:11px;background:var(--ac);color:var(--acink)}
+.how{list-style:none;counter-reset:s;max-width:340px;margin:18px auto 34px;padding:0;display:grid;gap:10px;text-align:left;font-size:.95rem;color:var(--mute)}
+.how li{counter-increment:s;display:flex;gap:12px;align-items:center}
+.how li::before{content:counter(s);flex:none;width:26px;height:26px;border-radius:50%;background:color-mix(in srgb,var(--ac) 16%,transparent);color:var(--ac);font-weight:800;display:grid;place-items:center;font-size:.85rem}
+footer{margin-top:56px;padding-top:28px;border-top:1px solid var(--line);color:var(--mute);font-size:.95rem}
+footer p{margin:0 0 16px}
+.priv{margin:20px 0 0;font-size:.82rem;line-height:1.5}
+.wl{display:inline-block;font-family:Unbounded,Arial,sans-serif;font-weight:500;font-size:.85rem;color:var(--ac);border:1.5px solid var(--ac);border-radius:999px;padding:12px 22px;text-decoration:none;transition:background .2s,color .2s}
+.wl:hover,.wl:focus-visible{background:var(--ac);color:var(--acink)}
+@media (max-width:380px){.mic{width:132px;height:132px}main{padding-left:16px;padding-right:16px}}
+@media (min-width:700px){main{padding-top:68px}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<main>
+<p class="brand"><span class="mark"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></span><span class="wm">Say It, <b>Schedule It</b></span></p>
+<p class="hi" id="hi"></p>
+<h1>What's coming up?</h1>
+<ol class="how"><li>Tap the mic and say your event.</li><li>Check the card that appears.</li><li>Tap Add to Google Calendar and save.</li></ol>
+<button class="mic" id="mic" type="button" aria-label="Start speaking">
+<svg viewBox="0 0 24 24" width="58" height="58" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg><span class="bars" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
+</button>
+<p id="status" aria-live="polite"></p>
+<p id="heard">Try: “Dentist next Friday at 3pm for 45 minutes”</p>
+<button class="lnk" id="typeb" type="button">Type instead</button>
+<div id="typebox"><input id="text" aria-label="Describe the event" placeholder="Lunch with Sam next Tuesday at 1pm"></div>
+<div id="events"></div>
+<footer><p>More features on iOS coming soon.</p><a class="wl" href="https://forms.cloud.microsoft/e/n2qQd8FnBF?origin=lprLink" target="_blank" rel="noopener">Join the iOS waitlist</a><p class="priv">We count visits and button taps. We don't store what you say or type. Voice recognition is done by your browser, which may send audio to Google or Apple.</p></footer>
+</main>
+<script>
+(function(){
+var $=function(i){return document.getElementById(i)};
+var SET={len:60,h:9,m:0,loc:""};
+var DAYS=["sunday","monday","tuesday","wednesday","thursday","friday","saturday"];
+var MON=["january","february","march","april","may","june","july","august","september","october","november","december"];
+var NUMW={a:1,an:1,one:1,two:2,three:3,four:4,five:5,six:6,seven:7,eight:8,nine:9,ten:10,half:.5};
+
+function pad(n){return (n<10?"0":"")+n}
+function ymd(d){return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate())}
+
+function parse(raw){
+  var s=" "+raw.trim()+" ", low=s.toLowerCase(), now=new Date(), note=[];
+  var date=null,h=null,m=0,dur=SET.len,loc="",title;
+  function cut(re){var x=re.exec(low);if(x){s=s.slice(0,x.index)+" "+s.slice(x.index+x[0].length);low=s.toLowerCase()}return x}
+
+  // duration
+  var d=cut(/\bfor\s+(an?|one|two|three|four|five|six|a half|half|\d+(?:\.\d+)?)\s*(hours?|hrs?|minutes?|mins?)(?:\s+and\s+a\s+half)?\b/);
+  if(d){var n=d[1].replace("a half","half");n=NUMW[n]!==undefined?NUMW[n]:parseFloat(n);dur=/^h/.test(d[2])?n*60:n}
+  // time
+  var t=cut(/\b(?:at\s+)?(\d{1,2})(?::(\d{2}))?\s*(am|pm|a\.m\.|p\.m\.)(?=\W|$)/)||null;
+  if(t){h=+t[1];m=+(t[2]||0);var pm=/^p/.test(t[3]);if(pm&&h<12)h+=12;if(!pm&&h===12)h=0}
+  else if((t=cut(/\bat\s+(\d{1,2}):(\d{2})\b/))){h=+t[1];m=+t[2]}
+  else if((t=cut(/\bat\s+(\d{1,2})\b(?!\s*(?:st|nd|rd|th))/))){h=+t[1];if(h<8)h+=12;m=0;note.push("Assumed "+(h>=12?"PM":"AM")+" — adjust if wrong.")}
+  else if(cut(/\b(?:at\s+)?noon\b/)){h=12}
+  else if(cut(/\b(?:at\s+)?midnight\b/)){h=0}
+  else if(cut(/\bin the morning\b/)){h=9}
+  else if(cut(/\bin the afternoon\b/)){h=15}
+  else if(cut(/\b(?:in the )?evening\b/)){h=19}
+
+  // date
+  var base=new Date(now.getFullYear(),now.getMonth(),now.getDate()),x;
+  if(cut(/\bday after tomorrow\b/)){base.setDate(base.getDate()+2);date=base}
+  else if(cut(/\btomorrow\b/)){base.setDate(base.getDate()+1);date=base}
+  else if(cut(/\b(today|tonight)\b/)){date=base}
+  else if((x=cut(new RegExp("\\b(?:(next|this|on)\\s+)?("+DAYS.join("|")+")\\b")))){
+    var tgt=DAYS.indexOf(x[2]),diff=(tgt-base.getDay()+7)%7;
+    if(x[1]==="next"&&diff<=6&&diff>=0){diff=diff===0?7:diff+(tgt>base.getDay()?7:0)}
+    else if(diff===0&&x[1]!=="this")diff=7;
+    base.setDate(base.getDate()+diff);date=base}
+  else if((x=cut(new RegExp("\\b(?:on\\s+)?("+MON.join("|")+"|"+MON.map(function(a){return a.slice(0,3)}).join("|")+")\\.?\\s+(\\d{1,2})(?:st|nd|rd|th)?\\b")))||
+          (x=(function(){var r=cut(new RegExp("\\b(?:on\\s+)?(\\d{1,2})(?:st|nd|rd|th)?\\s+(?:of\\s+)?("+MON.join("|")+"|"+MON.map(function(a){return a.slice(0,3)}).join("|")+")\\b"));return r?[r[0],r[2],r[1]]:null})())){
+    var mi=MON.findIndex(function(n){return n.slice(0,3)===x[1].slice(0,3)});
+    var dt=new Date(now.getFullYear(),mi,+x[2]);
+    if(dt<base)dt.setFullYear(dt.getFullYear()+1);date=dt}
+  else if(cut(/\bin\s+(a|an|one|two|three|four|five|\d+)\s+(day|days|week|weeks)\b/)){
+    var q=/\bin\s+(a|an|one|two|three|four|five|\d+)\s+(day|days|week|weeks)\b/.exec((" "+raw+" ").toLowerCase());
+    var k=NUMW[q[1]]||parseInt(q[1]);base.setDate(base.getDate()+k*(q[2][0]==="w"?7:1));date=base}
+  if(!date){date=base;note.push("No day found — used today.")}
+  if(h===null){h=SET.h;m=SET.m;note.push("No time found — used your usual start time.")}
+
+  // location: "at/in <place>" left after removing time/date
+  var lm=/\b(?:at|in|@)\s+([A-Z][^,.]*|[a-z][^,.]*)$/.exec(s.replace(/\s+/g," ").trim());
+  if(lm&&!/^(the (morning|afternoon|evening))$/i.test(lm[1])){loc=lm[1].trim();s=s.replace(new RegExp("\\s*(?:at|in|@)\\s+"+loc.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+"\\s*$","i")," ")}
+
+  title=s.replace(/\b(on|at|for|next|this)\s*$/i,"").replace(/^\s*(schedule|add|create|book|set up|remind me to|remind me about)\s+/i,"").replace(/\s+/g," ").trim().replace(/^[,.\s]+|[,.\s]+$/g,"");
+  if(title)title=title[0].toUpperCase()+title.slice(1);
+  var start=new Date(date.getFullYear(),date.getMonth(),date.getDate(),h,m);
+  var end=new Date(start.getTime()+dur*60000);
+  return {title:title||"New event",date:ymd(start),start:pad(start.getHours())+":"+pad(start.getMinutes()),end:pad(end.getHours())+":"+pad(end.getMinutes()),loc:loc,note:note.join(" "),overnight:end.getDate()!==start.getDate()};
+}
+
+function stamp(dateStr,timeStr,addDay){
+  var p=dateStr.split("-"),t=timeStr.split(":");
+  var d=new Date(+p[0],+p[1]-1,+p[2],+t[0],+t[1]);
+  if(addDay)d.setDate(d.getDate()+1);
+  return d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate())+"T"+pad(d.getHours())+pad(d.getMinutes())+"00";
+}
+
+function enc(s){return encodeURIComponent(s)}
+function track(n){try{window.goatcounter&&goatcounter.count&&goatcounter.count({path:n,title:n,event:true})}catch(e){}}
+function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function mins(t){var p=t.split(":");return +p[0]*60+ +p[1]}
+var events=[],raw="",llm=null,undo=null;
+var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+if(window.claude&&claude.use)claude.use("sample").then(function(s){llm=s}).catch(function(){});
+
+
+function enc(s){return encodeURIComponent(s)}
+function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+var events=[],raw="",llm=null,SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+if(window.claude&&claude.use)claude.use("sample").then(function(s){llm=s}).catch(function(){});
+function day8(s,n){var p=s.split("-"),d=new Date(+p[0],+p[1]-1,+p[2]+n);return d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate())}
+function rrule(r){return "RRULE:FREQ="+r.freq+(r.interval>1?";INTERVAL="+r.interval:"")+(r.count?";COUNT="+r.count:"")+(r.byday&&r.byday.length?";BYDAY="+r.byday.join(","):"")}
+function rtext(r){var u={DAILY:"day",WEEKLY:"week",MONTHLY:"month",YEARLY:"year"}[r.freq]||"week",n=r.interval>1;return "Repeats every "+(n?r.interval+" ":"")+u+(n?"s":"")+(r.byday&&r.byday.length?" on "+r.byday.join(", "):"")+(r.count?", "+r.count+" times":"")}
+function link(e){
+  if(!e.date||(!e.allday&&(!e.start||!e.end)))return "#";
+  var emails=e.att.filter(function(a){return /@/.test(a)}),names=e.att.filter(function(a){return !/@/.test(a)}),det=[];
+  if(names.length)det.push("With: "+names.join(", "));
+  if(e.remind)det.push("Reminder: "+e.remind+" min before");
+  det.push("Added by voice");
+  var dates=e.allday?day8(e.date,0)+"/"+day8(e.date,1):stamp(e.date,e.start,false)+"/"+stamp(e.date,e.end,e.end<=e.start);
+  var q="action=TEMPLATE&text="+enc(e.title)+"&dates="+dates+"&location="+enc(e.loc)+"&details="+enc(det.join("\n"));
+  if(emails.length)q+="&add="+enc(emails.join(","));
+  if(e.recur)q+="&recur="+enc(rrule(e.recur));
+  return "https://calendar.google.com/calendar/render?"+q;
+}
+function norm(x){
+  var d=/^\d{4}-\d{2}-\d{2}$/.test(x.date||"")?x.date:ymd(new Date()),s=/^\d{1,2}:\d{2}$/.test(x.start||"")?x.start:"09:00",e=/^\d{1,2}:\d{2}$/.test(x.end||"")?x.end:pad((+s.split(":")[0]+1)%24)+":"+s.split(":")[1];
+  return {title:x.title||"New event",date:d,start:s.length<5?"0"+s:s,end:e.length<5?"0"+e:e,loc:x.location||x.loc||"",att:x.attendees||[],recur:x.recur||null,remind:x.remind||null,allday:!!x.allday,note:x.note||""};
+}
+function when(e){
+  var d=new Date(e.date+"T00:00");if(isNaN(d))return "";
+  var ds=d.toLocaleDateString(undefined,{weekday:"short",day:"numeric",month:"short"}),
+  f=function(t){return new Date(e.date+"T"+t).toLocaleTimeString([],{hour:"numeric",minute:"2-digit"})};
+  return ds+" · "+(e.allday?"All day":f(e.start)+" – "+f(e.end))+(e.recur?" · "+rtext(e.recur):"");
+}
+function field(i,k,l,t){return '<label>'+l+'<input data-i="'+i+'" data-k="'+k+'" type="'+t+'" value="'+esc(events[i][k])+'"></label>'}
+function render(){
+  $("events").innerHTML=events.map(function(e,i){
+    return '<article class="card"><h2 id="ti'+i+'">'+esc(e.title)+'</h2><p class="when" id="wh'+i+'">'+esc(when(e))+'</p><p class="where" id="wl'+i+'"'+(e.loc?'':' hidden')+'>'+esc(e.loc)+'</p>'+
+    (e.note?'<p class="note">'+esc(e.note)+'</p>':'')+
+    '<details><summary>Edit details</summary>'+field(i,"title","Title","text")+'<div class="row">'+field(i,"date","Date","date")+field(i,"loc","Where","text")+'</div>'+
+    (e.allday?'':'<div class="row">'+field(i,"start","Start","time")+field(i,"end","End","time")+'</div>')+'</details>'+
+    '<a class="go" data-go="'+i+'" target="_blank" rel="noopener" href="'+esc(link(e))+'">Add to Google Calendar</a><button class="quiet" type="button" data-rm="'+i+'">Discard</button></article>';
+  }).join("");
+}
+$("events").addEventListener("input",function(ev){
+  var t=ev.target,i=t.getAttribute("data-i"),k=t.getAttribute("data-k");if(i===null)return;
+  var e=events[i];e[k]=t.value;$("ti"+i).textContent=e.title||"Untitled";$("wh"+i).textContent=when(e);
+  var w=$("wl"+i);w.textContent=e.loc;w.hidden=!e.loc;document.querySelector('[data-go="'+i+'"]').href=link(e);
+});
+$("events").addEventListener("click",function(ev){var g=ev.target.closest("[data-go]");if(g){track("add-event");g.classList.add("done");g.textContent="Opened in Google Calendar ✓"}var rm=ev.target.getAttribute("data-rm");if(rm!==null){events.splice(+rm,1);render()}});
+
+function aiPrompt(txt){
+  var n=new Date();
+  return "Today is "+n.toDateString()+", local time "+pad(n.getHours())+":"+pad(n.getMinutes())+", timezone "+Intl.DateTimeFormat().resolvedOptions().timeZone+". Convert this dictation into calendar events (there may be several). Return ONLY JSON: {\"events\":[{\"title\":string,\"date\":\"YYYY-MM-DD\",\"start\":\"HH:MM\",\"end\":\"HH:MM\",\"location\":string,\"attendees\":[string],\"recur\":null or {\"freq\":\"DAILY|WEEKLY|MONTHLY|YEARLY\",\"interval\":int,\"count\":int or null,\"byday\":[\"MO\",\"TU\"]},\"remind\":minutes-before int or null,\"allday\":boolean,\"note\":string}]}. Default length 60 minutes; if no time is given use 09:00. Birthdays, anniversaries and holidays are all-day; birthdays and anniversaries repeat YEARLY. note states any assumption, else empty string. Dictation: "+txt;
+}
+function setS(m){$("status").textContent=m}
+async function run(txt){
+  raw=txt.trim();if(!raw)return;
+  $("heard").textContent="“"+raw+"”";$("status").innerHTML='<span class="think"><i></i><i></i><i></i></span>Working it out';
+  var list=null;
+  if(llm){try{var r=await llm.json(aiPrompt(raw));list=(r&&r.events||[]).map(norm)}catch(err){}}
+  if(!list||!list.length){var p=parse(raw),bd=/birthday|anniversary/i.test(raw);list=[norm({title:p.title,date:p.date,start:p.start,end:p.end,location:p.loc,note:bd?"":p.note,allday:bd,recur:bd?{freq:"YEARLY",interval:1}:null})]}
+  events=list;render();setS("");
+}
+$("typeb").addEventListener("click",function(){$("typebox").classList.add("open");$("text").focus();$("typeb").hidden=true});
+$("text").addEventListener("keydown",function(e){if(e.key==="Enter")run($("text").value)});
+
+var hr=new Date().getHours();$("hi").textContent=hr<5?"":hr<12?"Good morning":hr<18?"Good afternoon":"Good evening";
+var rec=null,on=false;
+if(!SR){$("mic").disabled=true;$("typebox").classList.add("open");$("typeb").hidden=true;setS("Voice isn't supported in this browser. Type instead, or try Chrome or Safari.")}
+else{
+  rec=new SR();rec.lang=navigator.language||"en-GB";rec.interimResults=true;rec.continuous=false;
+  rec.onresult=function(e){var t="";for(var i=0;i<e.results.length;i++)t+=e.results[i][0].transcript;$("heard").textContent="“"+t+"”";$("text").value=t};
+  rec.onend=function(){on=false;$("mic").classList.remove("on");if($("text").value.trim())run($("text").value);else setS("Didn't catch that. Tap the mic and try again.")};
+  rec.onerror=function(e){setS(e.error==="not-allowed"?"Microphone is blocked. Allow it in your browser settings, or type instead.":"Voice stopped ("+e.error+"). Try again.")};
+  $("mic").addEventListener("click",function(){
+    if(on){rec.stop();return}
+    track("mic-tap");if(navigator.vibrate)navigator.vibrate(12);try{$("text").value="";$("heard").textContent="";rec.start();on=true;$("mic").classList.add("on");setS("Listening… tap to stop")}catch(err){}
+  });
+}
+})();
+</script>
+<script data-goatcounter="https://abidemiea.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
+</body>
+</html>
